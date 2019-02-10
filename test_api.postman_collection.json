@@ -1,0 +1,449 @@
+{
+	"info": {
+		"_postman_id": "167bf1d1-d389-4c53-a113-d61539683fbc",
+		"name": "Jordan Richards' API Test Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Example User Requests",
+			"item": [
+				{
+					"name": "Create an example user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1b9ba316-5ad4-4d7b-8ea1-87785ba34b09",
+								"exec": [
+									"if(JSON.parse(responseBody).id){",
+									"    pm.globals.set(\"example_user_id\", JSON.parse(responseBody).id);",
+									"}",
+									"",
+									"",
+									"var data = JSON.parse(responseBody);",
+									"",
+									"tests['Check for returned new user `id` in body'] = (data.id !== undefined);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e38e29a1-44ad-462e-bd67-be49e7b655ce",
+								"exec": [
+									"pm.globals.set(\"example_user_email\", \"johnsmith_\"+Math.round(Math.random() * 90000)+\"@example.com\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "givenName",
+									"value": "John",
+									"type": "text"
+								},
+								{
+									"key": "familyName",
+									"value": "Smith",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "{{example_user_email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Example1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "61b46467-9e55-44d8-8f4c-24f50befb3a9",
+								"exec": [
+									"pm.test(\"Check status code to be 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if(JSON.parse(responseBody).token){",
+									"    pm.globals.set(\"example_user_token\", JSON.parse(responseBody).token);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "password",
+									"value": "Example1",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "{{example_user_email}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update the name and email of the created example user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "dd816cb2-413a-4a51-ba76-b873c4bebe4f",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "16376ea7-5fb4-4d58-a585-aaaf76a028f0",
+								"exec": [
+									"pm.test(\"Check status to be 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"pm.globals.set(\"example_user_email\", \"updated_\"+pm.globals.get('example_user_email'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{example_user_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "updated_{{example_user_email}}",
+									"type": "text"
+								},
+								{
+									"key": "givenName",
+									"value": "Johnny",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/{{example_user_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"{{example_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch the created example user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7b7c0e2b-7876-403c-9a0d-b5684a6270e9",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "18aca5fe-ba38-40cf-8885-8639b7366e6c",
+								"exec": [
+									"pm.test(\"Check status to be 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Check for `id` inside the body\", function () {",
+									"    var data = JSON.parse(responseBody);",
+									"    pm.expect(data.id).to.eq(pm.globals.get(\"example_user_id\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{example_user_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/{{example_user_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"{{example_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete the created example user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "adc62d88-5e20-41f6-83eb-21c0a9c49948",
+								"exec": [
+									"pm.globals.unset(\"example_user_id\");",
+									"pm.globals.unset(\"example_user_token\");",
+									"pm.test(\"Check status to be 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{example_user_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/{{example_user_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"{{example_user_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "The requests inside are ordered so that you can try each of the user specific endpoints with the newly created example user's id.\n\nSet this up as a runner.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e214857f-1b90-41e6-9653-f86c48543bf0",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3f64deb1-9a7c-4621-8184-2fef16e3793c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "General Requests",
+			"item": [
+				{
+					"name": "Fetch the most recent 10 users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1a102d4f-6693-4341-bf9b-548adda371c0",
+								"exec": [
+									"pm.test(\"Check status to be 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/?limit=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								""
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "53477b9a-8279-4894-8cba-99399005c813",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "778ced3b-413f-4310-9221-f91d0cd3fee7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
